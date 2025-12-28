@@ -6,7 +6,7 @@ function Dahsboard() {
   return (
     <div className="h-screen flex flex-col">
       <Topbar />
-      <main className="flex flex-1">
+      <main className="flex flex-1 overflow-hidden">
         <SideBar />
         <ResumePage />
       </main>

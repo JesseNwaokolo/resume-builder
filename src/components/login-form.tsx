@@ -1,30 +1,76 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import FormImage from "../assets/logo.png";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Link } from "react-router-dom"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
+import * as z from "zod";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Login } from "@/helpers/Login";
+import { Spinner } from "./ui/spinner";
+import { toast } from "sonner";
+import { useAuthstore } from "@/store/useAuthStore";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const schema = z.object({
+    email: z.email(),
+    password: z.string(),
+  });
+
+  type FormFieldProps = z.infer<typeof schema>;
+
+  const setUser = useAuthstore((state) => state.setUser);
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { isSubmitting, errors },
+  } = useForm<FormFieldProps>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit: SubmitHandler<FormFieldProps> = async (data) => {
+    try {
+      const res = await Login(data);
+      if (!res?.success) {
+        return toast.error(res?.error?.message);
+      } else {
+        setUser(res.data?.user ?? null);
+      }
+    } catch (error) {
+      setError("root", {
+        message: "Error submitting",
+      });
+      console.log("Error submitting", error);
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-muted-foreground text-balance">
-                  Login to your <span className="underline underline-offset-2 font-mono">Resumify</span> account
+                  Login to your{" "}
+                  <span className="underline underline-offset-2 font-mono">
+                    Resumify
+                  </span>{" "}
+                  account
                 </p>
               </div>
               <Field>
@@ -34,6 +80,7 @@ export function LoginForm({
                   type="email"
                   placeholder="m@example.com"
                   required
+                  {...register("email")}
                 />
               </Field>
               <Field>
@@ -46,11 +93,19 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  {...register("password")}
+                />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? <Spinner /> : "Login"}
+                </Button>
               </Field>
+              <Field>{errors.root && <p>{errors.root.message}</p>}</Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
               </FieldSeparator>
@@ -90,7 +145,7 @@ export function LoginForm({
           </form>
           <div className="bg-muted relative hidden md:block">
             <img
-              src="/placeholder.svg"
+              src={FormImage}
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
@@ -102,5 +157,5 @@ export function LoginForm({
         and <a href="#">Privacy Policy</a>.
       </FieldDescription>
     </div>
-  )
+  );
 }

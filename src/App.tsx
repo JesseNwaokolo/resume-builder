@@ -4,8 +4,28 @@ import PublicRoute from "./components/PublicRoute";
 import Dashboard from "./pages/dashboard";
 import Login from "./pages/login";
 import Signup from "./pages/Signup";
+import { Toaster } from "@/components/ui/sonner";
+import { useEffect } from "react";
+import { supabase } from "./lib/supabase";
+import { useAuthstore } from "./store/useAuthStore";
 
 function App() {
+  const setSession = useAuthstore((state) => state.setSession);
+  const setUser = useAuthstore((state) => state.setUser);
+
+  useEffect(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session)
+        setUser(session?.user ?? null)
+      }
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
   return (
     <div className="h-dvh">
       <Routes>
@@ -23,6 +43,7 @@ function App() {
           }
         />
       </Routes>
+      <Toaster richColors />
     </div>
   );
 }

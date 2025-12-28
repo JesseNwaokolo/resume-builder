@@ -13,9 +13,15 @@ export const Login = async ({ email, password }: Props) => {
     });
 
     if (data.session) {
-      return data;
+      return {
+        success: true,
+        data,
+      };
     } else {
-      return error;
+      return {
+        success: false,
+        error,
+      };
     }
   } catch (error) {
     console.log(error);

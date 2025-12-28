@@ -1,39 +1,13 @@
 import { useSelectedStore } from "@/store/useSelectedStore";
 import { Minus, Plus } from "lucide-react";
 import { Button } from "./ui/button";
-
+import { info } from "../helpers/info";
 function SideBar() {
   const selected = useSelectedStore((state) => state.selected);
   const setSelected = useSelectedStore((state) => state.setSelected);
 
-  const info = [
-    {
-      name: "Personal Information",
-      id: 1,
-    },
-    {
-      name: "Professional Summary",
-      id: 2,
-    },
-    {
-      name: "Experience",
-      id: 3,
-    },
-    {
-      name: "Education",
-      id: 4,
-    },
-    {
-      name: "Skills",
-      id: 5,
-    },
-    {
-      name: "Profile or portfolio URL",
-      id: 6,
-    },
-  ];
   return (
-    <div className="flex flex-col w-1/4 border-r-2 ">
+    <div className="flex flex-col w-1/4 border-r-2">
       {info.map((item) => (
         <Button
           key={item.id}

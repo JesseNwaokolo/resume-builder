@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -9,22 +8,58 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
+import { SignUp } from "@/helpers/SignUp";
+import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import * as z from "zod";
+import FormImage from "../assets/logo.png";
+import { Spinner } from "./ui/spinner";
+import { toast } from "sonner";
 
-type FormFieldProps = {
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
+const schema = z
+  .object({
+    email: z.email(),
+    password: z.string().min(8, "Password Must be at least 8 characters"),
+    confirmPassword: z.string().min(8),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    error: "Passwords do not match",
+    path: ["password"],
+  });
+
+type FormFieldProps = z.infer<typeof schema>;
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { register, handleSubmit } = useForm<FormFieldProps>();
-  const onSubmit: SubmitHandler<FormFieldProps> = (data) => {
-    console.log(data);
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm<FormFieldProps>({
+    resolver: zodResolver(schema),
+  });
+  const onSubmit: SubmitHandler<FormFieldProps> = async (data) => {
+    try {
+      const { email, password } = data;
+      const res = await SignUp({ email, password });
+
+      if (res?.success) {
+        navigate("/", { replace: true });
+      } else {
+        toast.error(res?.error?.message);
+      }
+    } catch (error) {
+      setError("root", {
+        message: "Error submitting",
+      });
+      console.log("Error submitting", error);
+    }
   };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -77,10 +112,17 @@ export function SignupForm({
                 </Field>
                 <FieldDescription>
                   Must be at least 8 characters long.
+                  {errors.password && (
+                    <p className="text-sm text-red-500 font-medium">
+                      {errors.password.message}
+                    </p>
+                  )}
                 </FieldDescription>
               </Field>
               <Field>
-                <Button type="submit">Create Account</Button>
+                <Button type="submit" disabled={isSubmitting ? true : false}>
+                  {isSubmitting ? <Spinner /> : "Create Account"}
+                </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
@@ -121,7 +163,7 @@ export function SignupForm({
           </form>
           <div className="bg-muted relative hidden md:block">
             <img
-              src="/placeholder.svg"
+              src={FormImage}
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
