@@ -23,7 +23,7 @@ function ResumeInput() {
   };
   return (
     <div className="w-1/4 bg-white border-r-2 p-4 h-full overflow-y-auto">
-      <p className="text-sm font-medium mb-4">Upload your photos</p>
+      <p className="text-sm font-medium mb-4 underline underline-offset-2">Upload your photos</p>
       <img
         src={previewUrl ?? profile}
         alt="photo"
