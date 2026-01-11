@@ -3,6 +3,9 @@ import ResumeInput from "./ResumeInput";
 import ResumePreview from "./ResumePreview";
 import { Textarea } from "./ui/textarea";
 import Experience from "./Experience";
+import Education from "./Education";
+import Skills from "./Skills";
+import { Input } from "./ui/input";
 
 function ResumePage() {
   const selected = useSelectedStore((state) => state.selected);
@@ -15,24 +18,45 @@ function ResumePage() {
       case 2:
         return (
           <div className="w-1/4 bg-white border-r-2 p-4 h-full overflow-y-auto">
-            <p className="text-sm font-medium mb-4 underline underline-offset-2">Professional Summary</p>
-            <Textarea placeholder="Write a professional summary"/>
+            <p className="text-sm font-medium mb-4 underline underline-offset-2">
+              Professional Summary
+            </p>
+            <Textarea placeholder="Write a professional summary" />
           </div>
         );
 
-         case 3:
+      case 3:
         return (
           <div className="w-1/4 bg-white border-r-2 p-4 h-full overflow-y-auto">
             <Experience />
           </div>
         );
 
+      case 4:
+        return (
+          <div className="w-1/4 bg-white border-r-2 p-4 h-full overflow-y-auto">
+            <Education />
+          </div>
+        );
+
+      case 5:
+        return (
+          <div className="w-1/4 bg-white border-r-2 p-4 h-full overflow-y-auto">
+            <Skills />
+          </div>
+        );
+
+        case 6 : 
+        return (
+          <div className="w-1/4 bg-white border-r-2 p-4 h-full overflow-y-auto">
+           <Input placeholder="Enter porfolio url" type="url" />
+          </div>
+        )
+
       default:
         return null;
     }
   }
-
- 
 
   return (
     <div className="bg-gray-100 w-3/4 flex flex-1 overflow-y-auto">

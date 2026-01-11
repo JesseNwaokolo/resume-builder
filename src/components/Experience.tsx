@@ -13,7 +13,7 @@ function Experience() {
       <div className="mb-6">
         {number.map((item) => (
           <div key={item} className="space-y-2 mb-4">
-            <p className="text-gray-400 text-xl">Experience {item}</p>
+            <p className="text-gray-400 text-xl">Work Experience {item}</p>
             <div>
               <Label className="text-sm mb-2">Company name</Label>
               <Input />
